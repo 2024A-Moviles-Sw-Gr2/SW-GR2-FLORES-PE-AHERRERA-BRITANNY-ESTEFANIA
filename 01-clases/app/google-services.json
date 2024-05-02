@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "451112369742",
+    "project_id": "befp-2024a-sw-gr2",
+    "storage_bucket": "befp-2024a-sw-gr2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:451112369742:android:e991001453cf8db6a98d1f",
+        "android_client_info": {
+          "package_name": "com.example.a2024aswgr2befp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCld9EABGLa5W7Sr3DkrsDNrwDzoj6ovGE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
