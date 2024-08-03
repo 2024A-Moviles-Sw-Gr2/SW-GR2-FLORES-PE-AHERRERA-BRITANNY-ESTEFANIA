@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-  
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/account_circle"
+        android:title="Inicio"
+        android:iconTint="#FFFFFF"
+        android:titleTextColor="#FFFFFF" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/tray_arrow_down"
+        android:title="Descargas"
+        android:iconTint="#FFFFFF"
+        android:titleTextColor="#FFFFFF" />
+
+    <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/magnify"
+        android:title="Buscar"
+        android:iconTint="#FFFFFF"
+        android:titleTextColor="#FFFFFF" />
 </menu>
