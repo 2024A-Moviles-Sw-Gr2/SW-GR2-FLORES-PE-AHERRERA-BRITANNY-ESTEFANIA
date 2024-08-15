@@ -1,6 +1,5 @@
 package com.example.pinturasyartistasdeber2.Controlador
 
-
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -10,7 +9,7 @@ import com.example.pinturasyartistasdeber2.Entidades.Pintura
 
 class SqliteHelper(
     context: Context? /* this */
-) : SQLiteOpenHelper(context, "AndroidApp", null, 1) {
+) : SQLiteOpenHelper(context, "AndroidApp", null, 2) { // Asegúrate de actualizar la versión de la base de datos
 
     override fun onCreate(db: SQLiteDatabase?) {
         val createArtistaTable = """
@@ -26,26 +25,33 @@ class SqliteHelper(
 
         val createPinturaTable = """
             CREATE TABLE Pintura (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            titulo TEXT NOT NULL,
-            artistaId INTEGER NOT NULL,
-            fechaCreacion DATE NOT NULL,
-            esVendida BOOLEAN NOT NULL,
-            precio REAL NOT NULL,
-            FOREIGN KEY (artistaId) REFERENCES Artista(id)
-        );
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                titulo TEXT NOT NULL,
+                artistaId INTEGER NOT NULL,
+                fechaCreacion DATE NOT NULL,
+                esVendida BOOLEAN NOT NULL,
+                precio REAL NOT NULL,
+                latitud REAL,
+                longitud REAL,
+                FOREIGN KEY (artistaId) REFERENCES Artista(id)
+            );
         """.trimIndent()
 
         db?.execSQL(createArtistaTable)
         db?.execSQL(createPinturaTable)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        if (oldVersion < 2) { // Si la versión de la base de datos es menor a 2
+            // Agregar las nuevas columnas a la tabla Pintura
+            db?.execSQL("ALTER TABLE Pintura ADD COLUMN latitud REAL;")
+            db?.execSQL("ALTER TABLE Pintura ADD COLUMN longitud REAL;")
+        }
+    }
 
-
-    fun getAllArtistas():ArrayList<Artista>{
-        val lectureDB =readableDatabase
-        val queryScript ="""
+    fun getAllArtistas(): ArrayList<Artista> {
+        val lectureDB = readableDatabase
+        val queryScript = """
             SELECT * FROM Artista
         """.trimIndent()
         val queryResult = lectureDB.rawQuery(
@@ -53,7 +59,7 @@ class SqliteHelper(
             emptyArray()
         )
         val response = arrayListOf<Artista>()
-        if (queryResult.moveToFirst()){
+        if (queryResult.moveToFirst()) {
             do {
                 response.add(
                     Artista(
@@ -71,13 +77,14 @@ class SqliteHelper(
         lectureDB.close()
         return response
     }
+
     fun getPinturasPorArtista(identificador: Int): ArrayList<Pintura> {
         val lectureDB = readableDatabase
         val queryScript = """
-        SELECT id, titulo, fechaCreacion, esVendida, precio
-        FROM Pintura
-        WHERE artistaId=?
-    """.trimIndent()
+            SELECT id, titulo, fechaCreacion, esVendida, precio, latitud, longitud
+            FROM Pintura
+            WHERE artistaId=?
+        """.trimIndent()
         val queryResult = lectureDB.rawQuery(queryScript, arrayOf(identificador.toString()))
         val response = arrayListOf<Pintura>()
 
@@ -89,7 +96,9 @@ class SqliteHelper(
                         queryResult.getString(1),             // titulo
                         queryResult.getString(2),             // fechaCreacion
                         queryResult.getString(3).toBoolean(), // esVendida
-                        queryResult.getDouble(4)              // precio
+                        queryResult.getDouble(4),             // precio
+                        queryResult.getDouble(5),             // latitud
+                        queryResult.getDouble(6)              // longitud
                     )
                 )
             } while (queryResult.moveToNext())
@@ -99,20 +108,20 @@ class SqliteHelper(
         return response
     }
 
-
-    fun createArtista(nombre:String,
-                      fechaNacimiento:String,
-                      estaVivo:Boolean,
-                      numObras: Int,
-                      precioPromedio: Double):Boolean{
+    fun createArtista(
+        nombre: String,
+        fechaNacimiento: String,
+        estaVivo: Boolean,
+        numObras: Int,
+        precioPromedio: Double
+    ): Boolean {
         val writeDB = writableDatabase
         val valuesToStore = ContentValues()
         valuesToStore.put("nombre", nombre)
         valuesToStore.put("fechaNacimiento", fechaNacimiento)
         valuesToStore.put("estaVivo", estaVivo)
-        valuesToStore.put("numObras",numObras)
-        valuesToStore.put("precioPromedio",precioPromedio)
-
+        valuesToStore.put("numObras", numObras)
+        valuesToStore.put("precioPromedio", precioPromedio)
 
         val storeResult = writeDB.insert(
             "Artista",
@@ -121,22 +130,27 @@ class SqliteHelper(
         )
         writeDB.close()
 
-        return storeResult.toInt() !=-1
+        return storeResult.toInt() != -1
     }
+
     fun createPintura(
-        titulo:String,
-        artistaId:Int,
-        fechaCreacion:String,
-        esVendida:Boolean,
-        precio:Double,
-    ):Boolean{
+        titulo: String,
+        artistaId: Int,
+        fechaCreacion: String,
+        esVendida: Boolean,
+        precio: Double,
+        latitud: Double?,
+        longitud: Double?
+    ): Boolean {
         val writeDB = writableDatabase
         val valuesToStore = ContentValues()
-        valuesToStore.put("titulo",titulo)
-        valuesToStore.put("artistaId",artistaId)
-        valuesToStore.put("fechaCreacion",fechaCreacion)
-        valuesToStore.put("esVendida",esVendida)
-        valuesToStore.put("precio",precio)
+        valuesToStore.put("titulo", titulo)
+        valuesToStore.put("artistaId", artistaId)
+        valuesToStore.put("fechaCreacion", fechaCreacion)
+        valuesToStore.put("esVendida", esVendida)
+        valuesToStore.put("precio", precio)
+        valuesToStore.put("latitud", latitud)
+        valuesToStore.put("longitud", longitud)
 
         val storeResult = writeDB.insert(
             "Pintura",
@@ -145,7 +159,7 @@ class SqliteHelper(
         )
         writeDB.close()
 
-        return storeResult.toInt() !=-1
+        return storeResult.toInt() != -1
     }
 
     fun updateArtista(
@@ -168,7 +182,6 @@ class SqliteHelper(
         return updateResult != -1
     }
 
-    //TODO
     fun updatePintura(
         id: Int,
         precio: Double
@@ -189,9 +202,8 @@ class SqliteHelper(
         return updateResult != -1
     }
 
-    fun deleteArtista(id:Int): Boolean {
+    fun deleteArtista(id: Int): Boolean {
         val writeDB = writableDatabase
-        // SQL query example: where .... ID=? AND NAME=? [?=1, ?=2]
         val parametersDeleteQuery = arrayOf(id.toString())
         val deleteResult = writeDB.delete(
             "Artista",
@@ -203,9 +215,8 @@ class SqliteHelper(
         return deleteResult != -1
     }
 
-    fun deletePintura(id:Int): Boolean {
+    fun deletePintura(id: Int): Boolean {
         val writeDB = writableDatabase
-        // SQL query example: where .... ID=? AND NAME=? [?=1, ?=2]
         val parametersDeleteQuery = arrayOf(id.toString())
         val deleteResult = writeDB.delete(
             "Pintura",
@@ -216,5 +227,4 @@ class SqliteHelper(
 
         return deleteResult != -1
     }
-
 }

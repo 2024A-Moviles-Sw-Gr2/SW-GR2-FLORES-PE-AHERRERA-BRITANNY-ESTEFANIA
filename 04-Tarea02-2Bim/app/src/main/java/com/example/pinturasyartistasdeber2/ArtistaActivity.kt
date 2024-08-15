@@ -79,8 +79,24 @@ class ArtistaActivity : AppCompatActivity() {
             R.id.mi_eliminarpin ->{
                 openDialogEliminar(arrayPinturas[posicionItemSeleccionado].id)
                 return true
-            } else-> super.onContextItemSelected(item)
+            }
+            R.id.mi_ver_ubicacion ->{
+                irActividadMapa(GGoogleMapsActivity::class.java, arrayPinturas[posicionItemSeleccionado])
+                return true
+            }
+            else-> super.onContextItemSelected(item)
+
         }
+    }
+
+    private fun irActividadMapa(clase: Class<GGoogleMapsActivity>, pintura: Pintura) {
+            val intent = Intent(this,clase)
+            intent.apply {
+                putExtra("latitud", pintura.latitud)
+                putExtra("longitud", pintura.longitud)
+            }
+
+        startActivity(intent)
     }
 
     private fun irActividad(

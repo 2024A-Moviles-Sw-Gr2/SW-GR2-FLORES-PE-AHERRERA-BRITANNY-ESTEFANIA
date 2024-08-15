@@ -32,12 +32,17 @@ class CrearPintura : AppCompatActivity() {
 
         val btnGuardarPintura = findViewById<Button>(R.id.btn_guardar_pintura)
         btnGuardarPintura.setOnClickListener {
+            val coordendas = findViewById<EditText>(R.id.text_latitud).text.toString().split(",")
+            val latitud = coordendas[0]
+            val longitud = coordendas[1]
             DataBase.tables!!.createPintura(
                 nombrePintura.text.toString(),
                 idArtista,
                 fecha.text.toString(),
                 fueVendida.text.toString().toBoolean(),
-                precio.text.toString().toDouble()
+                precio.text.toString().toDouble(),
+                latitud.toDouble(),
+                longitud.toDouble()
             )
             irActividad(ArtistaActivity::class.java)
         }

@@ -13,8 +13,10 @@ class RecyclerViewAdapter(private val context: Context,private val listaPelicula
 
     // vertical - recycler horizontal.xml
     inner class SectionViewHolder(view: View):RecyclerView.ViewHolder(view){
-        val sectionName:TextView = view.findViewById(R.id.descripcion)
-        val recyclerView:RecyclerView = view.findViewById(R.id.recyclerView2)
+        // Referencia a un TextView para mostrar el nombre de la sección
+        val sectionName: TextView = view.findViewById(R.id.descripcion)
+        // Referencia a un RecyclerView para mostrar una lista horizontal de imágenes
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView2)
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionViewHolder {
         val itemView = LayoutInflater.from(parent.context)
@@ -26,15 +28,16 @@ class RecyclerViewAdapter(private val context: Context,private val listaPelicula
         return listaPeliculas.size
     }
 
+    // Se llama para enlazar los datos del modelo con la vista del ViewHolder
     override fun onBindViewHolder(holder: SectionViewHolder, position: Int) {
+        // Obtiene el nombre de la sección y la lista de imágenes para la posición actual
         val (sectionName, imageList) = listaPeliculas[position]
+        // Establece el texto del TextView con el nombre de la sección
         holder.sectionName.text = sectionName.toString()
 
-
-        // Configurar el RecyclerView horizontal
+        // Configura el RecyclerView horizontal dentro del ViewHolder
         holder.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        // Establece el adaptador del RecyclerView con la lista de imágenes
         holder.recyclerView.adapter = HorizontalRecyclerViewAdapter(imageList)
-
     }
-
 }

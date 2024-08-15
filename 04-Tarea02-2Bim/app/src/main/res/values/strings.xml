@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PinturasYArtistasDeber2</string>
+    <string name="title_activity_google_maps_inicio">GoogleMapsInicio</string>
 </resources>
